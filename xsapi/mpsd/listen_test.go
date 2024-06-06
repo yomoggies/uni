@@ -467,17 +467,19 @@ func (c *Conn) handleSignal(sig *nethernet.Signal) {
 	if err != nil {
 		panic(err)
 	}
-	err = c.ice.AddRemoteCandidate(&webrtc.ICECandidate{
-		Foundation:     i.Foundation(),
-		Priority:       i.Priority(),
-		Address:        i.Address(),
-		Protocol:       webrtc.ICEProtocolUDP,
-		Port:           uint16(i.Port()),
-		Typ:            webrtc.ICECandidateType(i.Type()),
-		RelatedAddress: i.RelatedAddress().Address,
-		RelatedPort:    uint16(i.RelatedAddress().Port),
-	})
-	if err != nil {
+	candidate := &webrtc.ICECandidate{
+		Foundation: i.Foundation(),
+		Priority:   i.Priority(),
+		Address:    i.Address(),
+		Protocol:   webrtc.ICEProtocolUDP,
+		Port:       uint16(i.Port()),
+		Typ:        webrtc.ICECandidateType(i.Type()),
+	}
+	if i.RelatedAddress() != nil {
+		candidate.RelatedAddress = i.RelatedAddress().Address
+		candidate.RelatedPort = uint16(i.RelatedAddress().Port)
+	}
+	if err := c.ice.AddRemoteCandidate(candidate); err != nil {
 		panic(err)
 	}
 	if c.candidatesReceived.Add(1) == 5 {
