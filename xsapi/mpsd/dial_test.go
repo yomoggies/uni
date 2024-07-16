@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/kr/pretty"
 	ice2 "github.com/pion/ice/v3"
 	"github.com/pion/logging"
 	"github.com/pion/sdp/v3"
@@ -13,7 +14,6 @@ import (
 	"github.com/yomoggies/uni/franchise"
 	"github.com/yomoggies/uni/franchise/signaling"
 	"github.com/yomoggies/uni/nethernet"
-	"github.com/yomoggies/uni/playfab/entity"
 	"github.com/yomoggies/uni/playfab/login"
 	"github.com/yomoggies/uni/xsapi/internal/test"
 	"golang.org/x/text/language"
@@ -68,9 +68,9 @@ func TestNetherNet(t *testing.T) {
 		if err != nil {
 			return nil, fmt.Errorf("login: %w", err)
 		}
-		master, err := entity.ExchangeTokenSource(
+		/*master, err := entity.ExchangeTokenSource(
 			context.Background(), identity.EntityToken, playfabTitle, identity.PlayFabID,
-		).Token()
+		).Token()*/
 		if err != nil {
 			return nil, fmt.Errorf("exchange entity token: %w", err)
 		}
@@ -84,45 +84,22 @@ func TestNetherNet(t *testing.T) {
 		}
 		return &franchise.TokenConfig{
 			Device: &franchise.DeviceConfig{
-				ApplicationType: franchise.ApplicationTypeMinecraftPE,
-				Capabilities:    []franchise.Capability{franchise.CapabilityRayTracing},
-				GameVersion:     "1.20.81",
-				ID:              uuid.New(),
-				Memory:          strconv.FormatUint(rand.Uint64(), 10),
-				Platform:        franchise.PlatformWindows10,
-				PlayFabTitleID:  playfabTitle.String(),
-				StorePlatform:   franchise.StorePlatformUWPStore,
-				TreatmentOverrides: []string{
-					"mc-sunsetting_1",
-					"mc-disable-legacypatchnotes",
-					"mc-oneds-prod",
-					"mc-nps-spender-free240402",
-					"mc-enable-feedback-landing-page",
-					"mc-aatest-evergreencf",
-					"mc-rp-hero-row-timer-6",
-					"mc-persona-realms",
-					"mc-en-ic",
-					"mc-maelstrom-disable",
-					"mc-reco-mbc_p400_20240514",
-					"mc-store-new-morebycreator-exp2",
-					"mc-pf-retry-enabled",
-					"mc-signaling-useturn",
-					"mc-rp-morelicensedsidebar",
-					"mc-rp-icons",
-					"mc-15-year-giveaway-2024",
-					"mc-enable-service-entitlements-manager",
-					"mcmktvlt-offerids-recos_lgbm3c",
-					"mc-signaling-usewebsockets",
-					"mc-rp-en15yraddon",
-					"mc-reco-algo13_p200_20240424",
-				},
-				Type: franchise.DeviceTypeWindows10,
+				ApplicationType:    franchise.ApplicationTypeMinecraftPE,
+				Capabilities:       []franchise.Capability{franchise.CapabilityRayTracing},
+				GameVersion:        "1.20.81",
+				ID:                 uuid.New(),
+				Memory:             strconv.FormatUint(rand.Uint64(), 10),
+				Platform:           franchise.PlatformWindows10,
+				PlayFabTitleID:     playfabTitle.String(),
+				StorePlatform:      franchise.StorePlatformUWPStore,
+				TreatmentOverrides: signaling.Treatments,
+				Type:               franchise.DeviceTypeWindows10,
 			},
 			User: &franchise.UserConfig{
 				Language:     language.English,
 				LanguageCode: language.AmericanEnglish,
 				RegionCode:   "US",
-				Token:        master.Token,
+				Token:        identity.SessionTicket,
 				TokenType:    franchise.TokenTypePlayFab,
 			},
 			Environment: authorizationEnv,
@@ -244,7 +221,7 @@ func TestNetherNet(t *testing.T) {
 	}
 
 	var (
-		networkID uint64 = 14372200213826914901
+		networkID uint64 = 9605974103385130081
 		connID           = rand.Uint64()
 	)
 	if err := signalingConn.WriteSignal(&nethernet.Signal{
@@ -289,6 +266,7 @@ func TestNetherNet(t *testing.T) {
 			if len(d.MediaDescriptions) != 1 {
 				t.Fatalf("unexpected number of media descriptions: %d", len(d.MediaDescriptions))
 			}
+			pretty.Println(d)
 			media := d.MediaDescriptions[0]
 
 			remoteICEParams.UsernameFragment, ok = media.Attribute("ice-ufrag")

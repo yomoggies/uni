@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ice" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/sctp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/turn" vcs="Git" />
   </component>
 </project>
