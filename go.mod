@@ -41,4 +41,7 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 )
 
-replace github.com/pion/webrtc/v4 => ./webrtc
+replace (
+github.com/pion/webrtc/v4 => ./webrtc
+github.com/pion/sctp => ./sctp
+)
